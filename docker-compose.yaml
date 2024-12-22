@@ -3,39 +3,20 @@ networks:
     external: true
 
 services:
-  composition-1:
-    container_name: composition-1
-    build:
-      context: .
-      dockerfile: composition/Dockerfile
-    ports:
-      - "8000:8000"
-    networks:
-      - composition_network
-
-  composition-2:
-    container_name: composition-2
+  composition:
     build:
       context: .
       dockerfile: composition/Dockerfile
     networks:
       - composition_network
-
-  composition-3:
-    container_name: composition-3
-    build:
-      context: .
-      dockerfile: composition/Dockerfile
-    networks:
-      - composition_network
+    deploy:
+      replicas: 3
 
   score:
     container_name: score
     build:
       context: .
       dockerfile: score/Dockerfile
-    ports:
-      - "50052:50052"
     networks:
       - composition_network
 
@@ -46,5 +27,14 @@ services:
       dockerfile: auth/Dockerfile
     ports:
       - "50051:50051"
+    networks:
+      - composition_network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
     networks:
       - composition_network
