@@ -1,9 +1,9 @@
 from random import random
 from concurrent import futures
 import grpc
-from pb.score_pb2 import ScoreResponse
-from pb import score_pb2_grpc
-from settings import Settings
+from score_pb2 import ScoreResponse
+import score_pb2_grpc
+from settings import settings
 
 
 class ScoreService(
@@ -17,17 +17,14 @@ class ScoreService(
         return ScoreResponse(score=score)
 
 
-settings = Settings()
-
-SCORE_SERVICE_HOST = settings.score_service_host
-SCORE_SERVICE_PORT = settings.score_service_port
+SCORE_SERVICE_URL = settings.score_service_url
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     score_pb2_grpc.add_ScoreServicer_to_server(
         ScoreService(), server
     )
-    server.add_insecure_port(f"{SCORE_SERVICE_HOST}:{SCORE_SERVICE_PORT}")
+    server.add_insecure_port(SCORE_SERVICE_URL)
     server.start()
     server.wait_for_termination()
 

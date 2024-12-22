@@ -1,0 +1,50 @@
+networks:
+  composition_network:
+    external: true
+
+services:
+  composition-1:
+    container_name: composition-1
+    build:
+      context: .
+      dockerfile: composition/Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - composition_network
+
+  composition-2:
+    container_name: composition-2
+    build:
+      context: .
+      dockerfile: composition/Dockerfile
+    networks:
+      - composition_network
+
+  composition-3:
+    container_name: composition-3
+    build:
+      context: .
+      dockerfile: composition/Dockerfile
+    networks:
+      - composition_network
+
+  score:
+    container_name: score
+    build:
+      context: .
+      dockerfile: score/Dockerfile
+    ports:
+      - "50052:50052"
+    networks:
+      - composition_network
+
+  auth:
+    container_name: auth
+    build:
+      context: .
+      dockerfile: auth/Dockerfile
+    ports:
+      - "50051:50051"
+    networks:
+      - composition_network

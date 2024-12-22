@@ -2,5 +2,11 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    auth_service_host: str = "localhost"
-    auth_service_port: str = "50051"
+    app_name: str = "Auth App"
+    auth_service_url: str
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()
