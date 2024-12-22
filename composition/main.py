@@ -2,12 +2,12 @@ from fastapi import FastAPI, HTTPException
 import grpc
 from grpc import RpcError
 from pydantic import BaseModel
-from settings import Settings
+from settings import settings
 
-from pb.auth_pb2 import AuthRequest
-from pb.auth_pb2_grpc import AuthStub
-from pb.score_pb2 import ScoreRequest
-from pb.score_pb2_grpc import ScoreStub
+from auth_pb2 import AuthRequest
+from auth_pb2_grpc import AuthStub
+from score_pb2 import ScoreRequest
+from score_pb2_grpc import ScoreStub
 
 
 class LoginRequest(BaseModel):
@@ -15,18 +15,14 @@ class LoginRequest(BaseModel):
     password: str
 
 
-settings = Settings()
-
 app = FastAPI()
 
 THRESHOLD_SCORE = settings.threshold_score
-AUTH_SERVICE_HOST = settings.auth_service_host
-AUTH_SERVICE_PORT = settings.auth_service_port
-SCORE_SERVICE_HOST = settings.score_service_host
-SCORE_SERVICE_PORT = settings.score_service_port
+AUTH_SERVICE = settings.auth_service_url
+SCORE_SERVICE = settings.score_service_url
 
 def get_score_grpc(login: str):
-    with grpc.insecure_channel(f"{SCORE_SERVICE_HOST}:{SCORE_SERVICE_PORT}") as channel:
+    with grpc.insecure_channel(SCORE_SERVICE) as channel:
         score_client = ScoreStub(channel)
         try:
             response = score_client.Scoring(ScoreRequest(login=login))
@@ -35,7 +31,7 @@ def get_score_grpc(login: str):
             return None
 
 def auth_grpc(request: LoginRequest):
-    with grpc.insecure_channel(f"{AUTH_SERVICE_HOST}:{AUTH_SERVICE_PORT}") as channel:
+    with grpc.insecure_channel(AUTH_SERVICE) as channel:
         auth_client = AuthStub(channel)
         try:
             response = auth_client.Authentication(AuthRequest(login=request.login, password=request.password))

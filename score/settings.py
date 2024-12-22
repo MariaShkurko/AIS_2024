@@ -2,5 +2,11 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    score_service_host: str = "localhost"
-    score_service_port: str = "50052"
+    app_name: str = "Score App"
+    score_service_url: str
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()
